@@ -1,11 +1,11 @@
 package SP20_simulator;
 
-// instruction에 따라 동작을 수행하는 메소드를 정의하는 클래스
-
+/**
+ * instruction에 따라 동작을 수행하는 메소드를 정의하는 클래스
+ */
 public class InstLuncher {
     ResourceManager rMgr;
     boolean returnValue;        //다음 명령어에 영향을 미치는 비교 연산의 결과 저장
-    int originAddr;             //JSUB 명령어를 수행할 때 RSUB 명령어를 통해 돌아올 주소를 저장
     String currDevice = "";     //현재 명령어가 사용하고 있는 device의 이름
     String targetAddr = "";     //현재 명령어의 Target Address
 
@@ -18,7 +18,8 @@ public class InstLuncher {
     }
 
     /**
-     *
+     * 명령어를 실질적으로 실행하는 함수
+     * 각각 명령어에 맞춰 해당 함수를 호출하여 다음 명령어의 주소를 리턴한다
      * @param inst 해당 명령어 정보
      * @param nixbpe nixbpe 비트
      * @param displacement displacement
@@ -176,7 +177,7 @@ public class InstLuncher {
     /**JSUB**/
     public int JSUB(int nixbpe, int displacement, int locctr) {
         //돌아올 주소 저장
-        originAddr = locctr;
+        rMgr.setRegister(2, locctr);
         //4 byte format이면
         if ((nixbpe & 0x1) == 1) {
             targetAddr = String.format("%06X", displacement);
@@ -253,6 +254,7 @@ public class InstLuncher {
     /**RSUB**/
     public int RSUB() {
         //저장해 두었던 주소로 돌아가기
+        int originAddr = rMgr.getRegister(2);
         targetAddr = String.format("%06X", originAddr);
         return originAddr * 2;
     }
